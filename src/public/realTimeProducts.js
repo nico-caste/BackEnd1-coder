@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const productsContainer = document.getElementById('productsContainer');
   const addProductForm = document.getElementById('addProductForm');
 
-  // Handle form submission
   addProductForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
@@ -26,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     addProductForm.reset();
   });
 
-  // Handle delete buttons
   productsContainer.addEventListener('click', (e) => {
     if (e.target.classList.contains('delete-btn')) {
       const productId = e.target.getAttribute('data-id');
@@ -34,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Listen for new products
   socket.on('newProduct', (product) => {
     const productCard = `
       <div class="col-md-4 mb-4 product-card" id="product-${product.id}">
@@ -52,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     productsContainer.insertAdjacentHTML('beforeend', productCard);
   });
 
-  // Listen for deleted products
   socket.on('deleteProduct', (productId) => {
     const productElement = document.getElementById(`product-${productId}`);
     if (productElement) {
@@ -60,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Listen for initial products (optional)
   socket.on('initialProducts', (products) => {
     productsContainer.innerHTML = products.map(product => `
       <div class="col-md-4 mb-4 product-card" id="product-${product.id}">

@@ -11,7 +11,6 @@ export class CartsService {
   async getCartById(id) {
     const cart = await this.cartManager.getCartById(id);
     
-    // Populate products with full product data
     const populatedProducts = await Promise.all(
       cart.products.map(async (item) => {
         const product = await this.productManager.getProductById(item.product);
@@ -34,7 +33,6 @@ export class CartsService {
   }
 
   async addProductToCart(cartId, productId, quantity = 1) {
-    // Verify product exists
     await this.productManager.getProductById(productId);
     return await this.cartManager.addProductToCart(cartId, productId, quantity);
   }
