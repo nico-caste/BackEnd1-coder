@@ -59,7 +59,7 @@ export class ProductManager {
     await this.saveToFile();
     
     if (this.io) {
-      this.io.emit('Nuevo producto', newProduct);
+      this.io.emit('newProduct', newProduct);
     }
     
     return newProduct;
@@ -96,7 +96,7 @@ export class ProductManager {
     await this.saveToFile();
     
     if (this.io) {
-      this.io.emit('Borrar producto', id);
+      this.io.emit('deleteProduct', id);
     }
     
     return deletedProduct[0];

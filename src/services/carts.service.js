@@ -1,3 +1,6 @@
+import { Cart } from '../models/cart.model.js';
+import { Product } from '../models/product.model.js';
+
 export class CartsService {
   constructor(cartManager, productManager) {
     this.cartManager = cartManager;
@@ -5,35 +8,64 @@ export class CartsService {
   }
 
   async createCart() {
-    return await this.cartManager.createCart();
+    const newCart = new Cart();
+    return await newCart.save();
   }
 
   async getCartById(id) {
-    const cart = await this.cartManager.getCartById(id);
-    
-    const populatedProducts = await Promise.all(
-      cart.products.map(async (item) => {
-        const product = await this.productManager.getProductById(item.product);
-        return {
-          ...item,
-          product: {
-            id: product.id,
-            title: product.title,
-            price: product.price,
-            thumbnails: product.thumbnails,
-          },
-        };
-      })
-    );
-
-    return {
-      ...cart,
-      products: populatedProducts,
-    };
+    const cart = await Cart.findById(id);
+    if (!cart) {
+      throw new Error('Carrito no encontrado');
+    }
+    return cart;
   }
 
   async addProductToCart(cartId, productId, quantity = 1) {
-    await this.productManager.getProductById(productId);
-    return await this.cartManager.addProductToCart(cartId, productId, quantity);
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new Error('producto no econtrado');
+    }
+
+    const cart = await Cart.findById(cartId);
+    if (!cart) {
+      throw new Error('Carrito no encontrado');
+    }
+
+    const productIndex = cart.products.findIndex(
+      item => item.product.toString() === productId
+    );
+
+    if (productIndex >= 0) {
+      cart.products[productIndex].quantity += quantity;
+    } else {
+      cart.products.push({ product: productId, quantity });
+    }
+    await cart.save();
+    return Cart.findById(cartId).populate('products.product');
   }
-}
+
+  async removeProductFromCart(cartId, productId) {
+    await this.productManager.getProductById(productId);
+    const cart = await this.cartManager.getCartById(cartId);
+
+    if (!cart) {
+      throw new Error('Cart not found');
+    }
+
+    cart.products = cart.products.filter(
+      item => item.product.toString() !== productId
+    );
+    await this.cartManager.saveToFile();
+    return cart;
+  }
+
+  async emptyCart(cartId) {
+    const cart = await this.cartManager.getCartById(cartId);
+    if (!cart) {
+      throw new Error('Cart not found');
+    }
+    cart.products = [];
+    await this.cartManager.saveToFile();
+    return cart;
+  }
+};

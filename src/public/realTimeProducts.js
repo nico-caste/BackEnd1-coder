@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
       description,
       price,
       stock,
-      code: Math.random().toString(36).substring(2, 10),
-      category: 'general',
+      // code: Math.random().toString(36).substring(2, 10),
+      category,
       status: true
     };
     
